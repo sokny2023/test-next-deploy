@@ -1,15 +1,11 @@
 version: '3'
-
 services:
   nextjs-app:
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "3003:3000"
-    volumes:
-      - .:/app
-      - /app/node_modules
+      - "80:3000" # Map port 80 to 3000 for public access
     environment:
-      NODE_ENV: development
-    command: npm run dev
+      NODE_ENV: production
+    command: npm run start
