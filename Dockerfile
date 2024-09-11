@@ -1,26 +1,14 @@
-# Use official Node.js image
 FROM node:18-alpine AS builder
-
-# Set working directory inside the container
 WORKDIR /app
-
-# Install dependencies
-COPY package.json package-lock.json ./
-RUN npm install
-
-# Copy all project files
+COPY package*.json ./
+RUN npm ci --only=production
 COPY . .
-
-# Build the Next.js project
 RUN npm run build
-
-# Run production environment
+RUN npm prune --production
 FROM node:18-alpine
 WORKDIR /app
-COPY --from=builder /app ./
-
-# Expose port
-EXPOSE 3000
-
-# Start the application
-CMD ["npm", "run", "start"]
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./package.json
+CMD ["npm", "start"]
